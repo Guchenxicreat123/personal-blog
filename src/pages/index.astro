@@ -1,0 +1,27 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PostCard from '../components/PostCard.astro';
+
+const posts = (await getCollection('blog', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 5);
+---
+
+<BaseLayout title="首页">
+  <section class="page-header">
+    <h1>你好，欢迎来到我的博客 👋</h1>
+    <p class="subtitle">这里记录我分享的技术内容，也有一份关于我的简历。</p>
+    <p style="margin-top:1.2rem">
+      <a href="/resume/">查看我的简历 →</a>
+    </p>
+  </section>
+
+  <section>
+    <h2>最新文章</h2>
+    <div class="post-list">
+      {posts.map((post) => <PostCard post={post} />)}
+    </div>
+    <p style="margin-top:1.5rem"><a href="/blog/">查看全部文章 →</a></p>
+  </section>
+</BaseLayout>

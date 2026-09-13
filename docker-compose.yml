@@ -1,0 +1,9 @@
+services:
+  blog:
+    build: .
+    image: personal-blog:latest
+    container_name: personal-blog
+    ports:
+      # 本地服务器 1020 端口 -> 容器 80 端口
+      - "1020:80"
+    restart: unless-stopped

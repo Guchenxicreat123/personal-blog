@@ -1,0 +1,89 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { resume } from '../data/resume';
+---
+
+<BaseLayout title="简历" description={`${resume.name} · ${resume.title}`}>
+  <div class="resume" data-pagefind-body>
+    <!-- 头部：姓名 / 定位 / 联系方式 -->
+    <header class="resume-hero">
+      <h1>{resume.name}</h1>
+      <div class="title">{resume.title}</div>
+      <p>{resume.summary}</p>
+      <div class="contacts">
+        {resume.location && <span>📍 {resume.location}</span>}
+        {resume.phone && <a href={`tel:${resume.phone}`}>📞 {resume.phone}</a>}
+        {resume.email && <a href={`mailto:${resume.email}`}>✉ {resume.email}</a>}
+        {resume.github && <a href={resume.github} target="_blank" rel="noopener">⌥ GitHub</a>}
+        {resume.website && <a href={resume.website} target="_blank" rel="noopener">🌐 网站</a>}
+      </div>
+    </header>
+
+    <!-- 技能 -->
+    <section class="resume-section">
+      <h2>技能</h2>
+      {resume.skills.map((g) => (
+        <div class="skill-group">
+          <div class="label">{g.label}</div>
+          <div>{g.items.join(' · ')}</div>
+        </div>
+      ))}
+    </section>
+
+    <!-- 工作经历 -->
+    <section class="resume-section">
+      <h2>工作经历</h2>
+      {resume.experience.map((e) => (
+        <div class="resume-item">
+          <div class="row">
+            <span class="role">{e.role} · <span class="org">{e.org}</span></span>
+            <span class="period">{e.period}</span>
+          </div>
+          <ul>
+            {e.highlights.map((h) => <li>{h}</li>)}
+          </ul>
+        </div>
+      ))}
+    </section>
+
+    <!-- 项目经验 -->
+    <section class="resume-section">
+      <h2>项目经验</h2>
+      {resume.projects.map((p) => (
+        <div class="resume-item">
+          <div class="row">
+            <span class="role">
+              {p.link ? <a href={p.link} target="_blank" rel="noopener">{p.name}</a> : p.name}
+            </span>
+            <span class="period">{p.tech.join(' · ')}</span>
+          </div>
+          <p style="margin:0.3rem 0 0">{p.description}</p>
+        </div>
+      ))}
+    </section>
+
+    <!-- 教育背景 -->
+    <section class="resume-section">
+      <h2>教育背景</h2>
+      {resume.education.map((ed) => (
+        <div class="resume-item">
+          <div class="row">
+            <span class="role">{ed.school} · <span class="org">{ed.major}</span></span>
+            <span class="period">{ed.period}</span>
+          </div>
+          <p style="margin:0.2rem 0 0">{ed.degree}</p>
+        </div>
+      ))}
+    </section>
+
+    <!-- 证书 -->
+    {resume.certifications && resume.certifications.length > 0 && (
+      <section class="resume-section">
+        <h2>证书 / 其他</h2>
+        <ul>
+          {resume.certifications.map((c) => <li>{c}</li>)}
+        </ul>
+      </section>
+    )}
+  </div>
+</BaseLayout>

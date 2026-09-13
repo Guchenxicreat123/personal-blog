@@ -1,0 +1,82 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostCard from '../../components/PostCard.astro';
+
+const posts = (await getCollection('blog', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+// 统计标签及数量
+const tagMap = new Map<string, number>();
+for (const p of posts) {
+  for (const t of p.data.tags) {
+    tagMap.set(t, (tagMap.get(t) ?? 0) + 1);
+  }
+}
+const tags = [...tagMap.entries()].sort((a, b) => b[1] - a[1]);
+---
+
+<BaseLayout title="博客">
+  <header class="page-header">
+    <h1>全部文章</h1>
+    <p class="subtitle">共 {posts.length} 篇 · 点击标签可筛选</p>
+  </header>
+
+  {tags.length > 0 && (
+    <div class="tag-filter" id="tag-filter">
+      <button type="button" class="tag-chip active" data-tag="">全部 <span class="count">{posts.length}</span></button>
+      {tags.map(([tag, count]) => (
+        <button type="button" class="tag-chip" data-tag={tag}>
+          {tag} <span class="count">{count}</span>
+        </button>
+      ))}
+    </div>
+  )}
+
+  <div class="post-list" id="post-list">
+    {posts.map((post) => <PostCard post={post} />)}
+  </div>
+
+  <p class="empty" id="empty-state" style="display:none">该标签下暂无文章</p>
+
+  <script is:inline>
+    (function () {
+      var chips = document.querySelectorAll('.tag-chip');
+      var list = document.getElementById('post-list');
+      var empty = document.getElementById('empty-state');
+      var cards = list
+        ? Array.prototype.slice.call(list.querySelectorAll('.post-card'))
+        : [];
+
+      function setActive(tag) {
+        for (var i = 0; i < chips.length; i++) {
+          chips[i].classList.toggle('active', chips[i].getAttribute('data-tag') === tag);
+        }
+        var visible = 0;
+        for (var j = 0; j < cards.length; j++) {
+          var cardTags = (cards[j].getAttribute('data-tags') || '').split(',');
+          var show = !tag || cardTags.indexOf(tag) !== -1;
+          cards[j].style.display = show ? '' : 'none';
+          if (show) visible++;
+        }
+        if (empty) empty.style.display = visible === 0 ? '' : 'none';
+      }
+
+      // 初始：从 URL ?tag= 读取（支持分享链接直达筛选状态）
+      var params = new URLSearchParams(location.search);
+      var initial = params.get('tag') || '';
+      if (initial) setActive(initial);
+
+      chips.forEach(function (chip) {
+        chip.addEventListener('click', function () {
+          var tag = chip.getAttribute('data-tag') || '';
+          setActive(tag);
+          var url = new URL(location.href);
+          if (tag) url.searchParams.set('tag', tag);
+          else url.searchParams.delete('tag');
+          history.replaceState({}, '', url);
+        });
+      });
+    })();
+  </script>
+</BaseLayout>
