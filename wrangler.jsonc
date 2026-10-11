@@ -5,7 +5,7 @@
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "personal-blog",
-	"main": "src/content.config.ts",
+	"main": "src/data/resume.ts",
 	"compatibility_date": "2025-10-08",
 	"assets": {
 		"directory": "./dist",
